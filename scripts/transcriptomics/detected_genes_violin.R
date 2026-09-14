@@ -1,6 +1,6 @@
 # ============================================================
-# Genes detectados con TPM >= 1
-# Violin plot: C. melo mock, C. melo inoculated y P. xanthii
+# Detected genes with TPM >= 1
+# Violin plot: C. melo mock, C. melo inoculated and P. xanthii
 # ============================================================
 
 suppressPackageStartupMessages({
@@ -14,14 +14,14 @@ suppressPackageStartupMessages({
 })
 
 # ------------------------------------------------------------
-# Archivos de entrada
+# Input files
 # ------------------------------------------------------------
 
 cm_file <- "03_Transcriptomics_Cm_TPM.txt"
 px_file <- "03_Transcriptomics_Px_TPM.txt"
 
 # ------------------------------------------------------------
-# Leer matrices TPM
+# Read TPM matrices
 # ------------------------------------------------------------
 
 cm <- read_tsv(
@@ -35,7 +35,7 @@ px <- read_tsv(
 )
 
 # ------------------------------------------------------------
-# Columnas de anotación
+# Annotation columns
 # ------------------------------------------------------------
 
 meta_cols <- c(
@@ -48,7 +48,7 @@ meta_cols <- c(
 )
 
 # ------------------------------------------------------------
-# Identificar columnas de muestras
+# Identify sample columns
 # ------------------------------------------------------------
 
 cm_sample_cols <- setdiff(
@@ -62,7 +62,7 @@ px_sample_cols <- setdiff(
 )
 
 # ------------------------------------------------------------
-# Convertir columnas TPM a formato numérico
+# Convert TPM columns to numeric
 # ------------------------------------------------------------
 
 cm <- cm %>%
@@ -82,7 +82,7 @@ px <- px %>%
   )
 
 # ------------------------------------------------------------
-# Contar genes con TPM >= 1 en cada muestra de melón
+# Count genes with TPM >= 1 in each melon sample
 # ------------------------------------------------------------
 
 cm_detected <- cm %>%
@@ -109,7 +109,7 @@ cm_detected <- cm %>%
   )
 
 # ------------------------------------------------------------
-# Contar genes con TPM >= 1 en cada muestra de P. xanthii
+# Count genes with TPM >= 1 in each P. xanthii sample
 # ------------------------------------------------------------
 
 px_detected <- px %>%
@@ -129,7 +129,7 @@ px_detected <- px %>%
   )
 
 # ------------------------------------------------------------
-# Combinar los tres grupos
+# Combine the three groups
 # ------------------------------------------------------------
 
 plot_df <- bind_rows(
@@ -148,7 +148,7 @@ plot_df <- bind_rows(
   )
 
 # ------------------------------------------------------------
-# Resumen estadístico
+# Summary statistics
 # ------------------------------------------------------------
 
 summary_df <- plot_df %>%
@@ -186,7 +186,7 @@ write_tsv(
 )
 
 # ------------------------------------------------------------
-# Colores
+# Colors
 # ------------------------------------------------------------
 
 group_colors <- c(
@@ -196,7 +196,7 @@ group_colors <- c(
 )
 
 # ------------------------------------------------------------
-# Figura
+# Figure
 # ------------------------------------------------------------
 
 p <- ggplot(
@@ -329,13 +329,13 @@ p <- ggplot(
   )
 
 # ------------------------------------------------------------
-# Mostrar figura
+# Display figure
 # ------------------------------------------------------------
 
 p
 
 # ------------------------------------------------------------
-# Guardar figura
+# Save figure
 # ------------------------------------------------------------
 
 ggsave(
