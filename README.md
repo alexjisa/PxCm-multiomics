@@ -1,31 +1,35 @@
 # PxCm-multiomics
 
-Analysis code accompanying the manuscript:
+Analysis code associated with the dataset and manuscript:
 
-> **Temporal multi-omics dataset of a cucurbit-powdery mildew interaction**
-> Jimenez-Sanchez A., Fernandez-Ortuno D., Pastor V., Polonio A., Perez-Garcia A.
+> **Temporal multi-omics dataset of a cucurbit-powdery mildew interaction**  
+> Jiménez-Sánchez A., Fernández-Ortuño D., Pastor V., Polonio Á., Pérez-García A.  
 > *Scientific Data* (in preparation, 2026).
 
 ## Overview
 
-Temporal dual RNA-seq (host-pathogen) and untargeted LC-MS/MS metabolomics of
-the *Cucumis melo* (melon) - *Podosphaera xanthii* (cucurbit powdery mildew)
-interaction. Inoculated and mock-treated melon leaves were sampled at 12 time
-points from 12 to 144 hours post-inoculation (hpi), and profiled by dual
-RNA-seq and untargeted metabolomics from the same biological material. This
-repository contains the R scripts used to process and explore that dataset:
-differential expression, functional enrichment, temporal clustering, and
-metabolomics QC/differential abundance analysis.
+This repository contains analysis code associated with a temporal dual
+RNA-seq and untargeted LC-MS/MS metabolomics dataset of the *Cucumis
+melo*–*Podosphaera xanthii* (cucurbit powdery mildew) interaction.
+
+The experiment comprises 12 time points from 12 to 144 hours post-inoculation
+(hpi), providing temporal transcriptomic profiles of both host and pathogen
+together with metabolomic profiles of the infected host tissue. The scripts
+here cover differential expression, functional enrichment, temporal
+clustering, and metabolomics QC/differential abundance analysis.
+
+Raw and processed datasets are deposited in public repositories as detailed
+below.
 
 ## Data availability
 
-- **Raw RNA-seq (FASTQ)**: NCBI SRA, BioProject
-  [PRJNA1454108](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA1454108).
-- **Raw LC-MS/MS (metabolomics)**: MetaboLights, accession
-  [MTBLS15447](https://www.ebi.ac.uk/metabolights/MTBLS15447).
-- **Processed data** (count/TPM matrices, differential expression results,
-  functional enrichment, metabolomics tables and complete sample metadata):
-  Zenodo, [DOI 10.5281/zenodo.19555639](https://doi.org/10.5281/zenodo.19555639).
+- **Raw RNA-seq data (FASTQ):** NCBI Sequence Read Archive (SRA), BioProject [PRJNA1454108](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA1454108).
+- **Raw LC-MS/MS data (vendor raw and CDF files):** MetaboLights, accession [MTBLS15447](https://www.ebi.ac.uk/metabolights/MTBLS15447).
+- **Processed transcriptomics and metabolomics data:** Zenodo, [DOI: 10.5281/zenodo.19555639](https://doi.org/10.5281/zenodo.19555639).
+
+The Zenodo repository includes count and TPM matrices, differential
+expression results, functional enrichment results, processed metabolomics
+tables, and sample metadata.
 
 ## Repository structure
 
@@ -82,31 +86,38 @@ Each script's header documents its exact inputs, outputs, and usage. Within
 each `scripts/transcriptomics/` and `scripts/metabolomics/` folder, scripts
 are independent of each other (none reads another script's output).
 
-## Dependencies (R)
+## Dependencies
+
+Analyses were performed in R.
+
+Main R packages include:
 
 `DESeq2`, `ggplot2`, `dplyr`, `tidyr`, `stringr`, `readr`, `readxl`,
 `pheatmap`, `viridis`, `ggrepel`, `Rtsne`, `uwot`, `dendextend`, `scales`,
-`svglite`, `limma`. Optional (functional enrichment): `clusterProfiler`,
-`enrichplot`, `KEGGREST`, `httr`, `xml2`, `rvest`.
+`svglite`, and `limma`.
 
-Exact package versions verified to run these scripts are listed in
+Optional packages used for functional enrichment include:
+
+`clusterProfiler`, `enrichplot`, `KEGGREST`, `httr`, `xml2`, and `rvest`.
+
+Exact package versions used to run the analyses are provided in
 [`session_info.txt`](session_info.txt) (R 4.4.2, matching the version cited
 in the article's Methods).
 
 ## Repository status
 
-This repository is currently under construction. The final analysis scripts
-associated with the article are being prepared and will be uploaded to this
-repository.
+This repository is currently under construction. The final analysis scripts associated with the article are being prepared and will be uploaded to this repository.
 
 ## License
 
-MIT, see [LICENSE](LICENSE).
+This repository is distributed under the MIT License. See [LICENSE](LICENSE) for details.
 
-## Citation
+## Cite us
 
-> **Temporal multi-omics dataset of a cucurbit-powdery mildew interaction**
-> Jimenez-Sanchez A., Fernandez-Ortuno D., Pastor V., Polonio A., Perez-Garcia A.
+If you use the code or any of the associated datasets, please cite the corresponding article:
+
+> **Temporal multi-omics dataset of a cucurbit-powdery mildew interaction**  
+> Jiménez-Sánchez A., Fernández-Ortuño D., Pastor V., Polonio Á., Pérez-García A.  
 > *Scientific Data* (in preparation, 2026).
 
 The full citation and DOI will be added upon publication.
