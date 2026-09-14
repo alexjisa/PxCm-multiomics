@@ -81,6 +81,18 @@ Detalles completos de parametros en la seccion Methods del articulo.
 `svglite`. Opcionales (enriquecimiento funcional): `clusterProfiler`,
 `enrichplot`, `KEGGREST`, `httr`, `xml2`, `rvest`.
 
+## Estado del repositorio
+
+Este repositorio esta en construccion. Actualmente incluye el procesado
+DESeq2/clustering/enriquecimiento de transcriptomica y dos scripts de
+visualizacion de metabolomica (cobertura de rutas y heatmap de dinamica
+temporal). Pendiente de anadir el script de control de calidad y analisis
+exploratorio de metabolomica (PCA de muestras, boxplot/densidad de
+intensidades, correlacion y CV entre replicas, valores ausentes, volcano
+plots por punto temporal y el resumen de resultados temporales), que
+actualmente solo existe como figuras/tablas de salida sin el codigo fuente
+incorporado aqui todavia.
+
 ## Citacion
 
 Si usas este codigo o el dataset asociado, por favor cita el articulo (ver
