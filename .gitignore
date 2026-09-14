@@ -1,0 +1,13 @@
+# Datos y resultados (no se versionan en este repo de codigo)
+results/
+results_melon/
+
+# R
+.Rhistory
+.Rapp.history
+.RData
+.Rproj.user/
+*.Rproj
+
+# SO
+.DS_Store
