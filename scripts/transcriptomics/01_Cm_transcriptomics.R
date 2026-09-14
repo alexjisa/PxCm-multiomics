@@ -1,21 +1,24 @@
-############################################################
-### Cucumis melo RNA-seq time-course analysis
-### Publication-oriented integrated script
-###
-### Includes:
-### - TPM export
-### - Sample distances, dendrogram, PCA, t-SNE, UMAP
-### - DESeq2 with condition * time_point design
-### - Inoculated vs Mock contrasts at each time point
-### - Distribution of expression changes (violin plot)
-### - Temporal clustering of DEGs (k-means, Inoculated trajectory)
-### - Functional enrichment analysis (GO / KEGG)
-###
-### Color strategy:
-### - Mock: C. melo green from viridis
-### - Inoculated: darker blue-green from viridis
-### - Up/down DEG summaries: accessible signed-effect colors from plasma
-############################################################
+# =============================================================================
+# Script:  01_Cm_transcriptomics.R
+# Purpose: Cucumis melo dual RNA-seq time-course analysis - TPM export, sample
+#          QC (distance heatmap/dendrogram, PCA, t-SNE, UMAP), DESeq2
+#          differential expression (Inoculated vs Mock at each time point,
+#          and consecutive-time-point contrasts within each condition),
+#          temporal k-means clustering of DEGs, and GO/KEGG functional
+#          enrichment per cluster (requires optional annotation file, see
+#          Input below).
+#
+# Input:   data/transcriptomics/01_Transcriptomics_Cm_counts.txt
+#          data/transcriptomics/02_Transcriptomics_Cm_sample_info.txt
+#          data/transcriptomics/Cm_functional_annotation.tsv (optional; tab-
+#            separated, columns Geneid/GO/KEGG - see docs/data_dictionary.md
+#            for a known format mismatch with the deposited eggNOG-mapper file)
+# Output:  results/transcriptomics/Cm/figures/
+#          results/transcriptomics/Cm/tables/ (deseq2, tsne, umap, clustering,
+#            enrichment subfolders)
+# Usage:   Rscript scripts/transcriptomics/01_Cm_transcriptomics.R
+#          (run from the project root; see data/README.md to obtain inputs)
+# =============================================================================
 
 ############################################################
 ### 1. Load required libraries
@@ -42,17 +45,14 @@ has_enrichplot <- requireNamespace("enrichplot", quietly = TRUE)
 ### 2. Define input files and output directories
 ############################################################
 
-project_root <- if (dir.exists(file.path(getwd(), "data", "processed"))) {
-  file.path(getwd(), "data", "processed")
-} else {
-  getwd()
-}
+# Paths are relative to the project root (see Usage in the header above).
+data_dir <- file.path("data", "transcriptomics")
 
-counts_file <- file.path(project_root, "01_Transcriptomics_Cm_counts.txt")
-sampleinfo_file <- file.path(project_root, "02_Transcriptomics_Cm_sample_info.txt")
-annotation_file <- file.path(project_root, "Cm_functional_annotation.tsv")   # Optional
+counts_file <- file.path(data_dir, "01_Transcriptomics_Cm_counts.txt")
+sampleinfo_file <- file.path(data_dir, "02_Transcriptomics_Cm_sample_info.txt")
+annotation_file <- file.path(data_dir, "Cm_functional_annotation.tsv")   # Optional
 
-results_root <- file.path(project_root, "results_melon")
+results_root <- file.path("results", "transcriptomics", "Cm")
 figures_dir <- file.path(results_root, "figures")
 tables_dir <- file.path(results_root, "tables")
 deseq_dir <- file.path(tables_dir, "deseq2")

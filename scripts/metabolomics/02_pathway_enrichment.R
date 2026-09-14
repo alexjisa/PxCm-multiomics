@@ -1,3 +1,16 @@
+# =============================================================================
+# Script:  02_pathway_enrichment.R
+# Purpose: Plot KEGG pathway coverage for the top 16 enriched pathways from
+#          the MarVis-Pathway output, as a bubble plot (coverage on x, pathway
+#          on y, bubble size = putative compound hits, color = enrichment
+#          score).
+#
+# Input:   data/metabolomics/14_Metabolomics_Sets.xlsx
+# Output:  results/metabolomics/pathway_enrichment/metabolomics_pathway_coverage.{png,pdf,svg}
+# Usage:   Rscript scripts/metabolomics/02_pathway_enrichment.R
+#          (run from the project root; see data/README.md to obtain inputs)
+# =============================================================================
+
 suppressPackageStartupMessages({
   library(readxl)
   library(dplyr)
@@ -6,7 +19,12 @@ suppressPackageStartupMessages({
   library(svglite)
 })
 
-input_file <- "14_Metabolomics_Sets.xlsx"
+# Paths are relative to the project root (see Usage in the header above).
+data_dir <- file.path("data", "metabolomics")
+results_dir <- file.path("results", "metabolomics", "pathway_enrichment")
+dir.create(results_dir, recursive = TRUE, showWarnings = FALSE)
+
+input_file <- file.path(data_dir, "14_Metabolomics_Sets.xlsx")
 
 df <- read_excel(input_file)
 
@@ -134,7 +152,7 @@ p <- ggplot(
   )
 
 ggsave(
-  "metabolomics_pathway_coverage.png",
+  file.path(results_dir, "metabolomics_pathway_coverage.png"),
   p,
   width = 12,
   height = 5,
@@ -142,14 +160,14 @@ ggsave(
 )
 
 ggsave(
-  "metabolomics_pathway_coverage.pdf",
+  file.path(results_dir, "metabolomics_pathway_coverage.pdf"),
   p,
   width = 12,
   height = 5
 )
 
 ggsave(
-  "metabolomics_pathway_coverage.svg",
+  file.path(results_dir, "metabolomics_pathway_coverage.svg"),
   p,
   width = 12,
   height = 5

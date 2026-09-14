@@ -1,7 +1,16 @@
-# ============================================================
-# Detected genes with TPM >= 1
-# Violin plot: C. melo mock, C. melo inoculated and P. xanthii
-# ============================================================
+# =============================================================================
+# Script:  03_detected_genes.R
+# Purpose: Count genes detected (TPM >= 1) per sample for C. melo (Mock and
+#          Inoculated) and P. xanthii, and plot their distribution as a
+#          violin plot with per-sample points and group medians.
+#
+# Input:   data/transcriptomics/03_Transcriptomics_Cm_TPM.txt
+#          data/transcriptomics/03_Transcriptomics_Px_TPM.txt
+# Output:  results/transcriptomics/detected_genes/Detected_genes_TPM1_summary.tsv
+#          results/transcriptomics/detected_genes/Detected_genes_TPM1_violin.{png,pdf,svg}
+# Usage:   Rscript scripts/transcriptomics/03_detected_genes.R
+#          (run from the project root; see data/README.md to obtain inputs)
+# =============================================================================
 
 suppressPackageStartupMessages({
   library(readr)
@@ -14,11 +23,15 @@ suppressPackageStartupMessages({
 })
 
 # ------------------------------------------------------------
-# Input files
+# Input and output paths (relative to the project root)
 # ------------------------------------------------------------
 
-cm_file <- "03_Transcriptomics_Cm_TPM.txt"
-px_file <- "03_Transcriptomics_Px_TPM.txt"
+data_dir <- file.path("data", "transcriptomics")
+results_dir <- file.path("results", "transcriptomics", "detected_genes")
+dir.create(results_dir, recursive = TRUE, showWarnings = FALSE)
+
+cm_file <- file.path(data_dir, "03_Transcriptomics_Cm_TPM.txt")
+px_file <- file.path(data_dir, "03_Transcriptomics_Px_TPM.txt")
 
 # ------------------------------------------------------------
 # Read TPM matrices
@@ -182,7 +195,7 @@ print(summary_df)
 
 write_tsv(
   summary_df,
-  "Detected_genes_TPM1_summary.tsv"
+  file.path(results_dir, "Detected_genes_TPM1_summary.tsv")
 )
 
 # ------------------------------------------------------------
@@ -339,7 +352,7 @@ p
 # ------------------------------------------------------------
 
 ggsave(
-  filename = "Detected_genes_TPM1_violin.png",
+  filename = file.path(results_dir, "Detected_genes_TPM1_violin.png"),
   plot = p,
   width = 7,
   height = 5,
@@ -349,7 +362,7 @@ ggsave(
 )
 
 ggsave(
-  filename = "Detected_genes_TPM1_violin.pdf",
+  filename = file.path(results_dir, "Detected_genes_TPM1_violin.pdf"),
   plot = p,
   width = 7,
   height = 5,
@@ -358,7 +371,7 @@ ggsave(
 )
 
 ggsave(
-  filename = "Detected_genes_TPM1_violin.svg",
+  filename = file.path(results_dir, "Detected_genes_TPM1_violin.svg"),
   plot = p,
   width = 7,
   height = 5,

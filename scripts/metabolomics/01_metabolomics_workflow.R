@@ -1,21 +1,37 @@
-############################################################
-### Reproducible metabolomics workflow
-### Canonical preprocessing pipeline for untargeted data
-###
-### Style aligned with C. melo RNA-seq script:
-### - Mock: C. melo green from viridis
-### - Inoculated: darker blue-green from viridis
-### - Time points: sequential viridis
-### - Heatmaps: viridis
-### - PCA/t-SNE/UMAP/dendrogram: publication-style theme
-###
-### Added DAM analysis:
-### - limma contrasts on median-normalized log10 values before Pareto scaling
-### - DAM threshold: adjusted p-value < 0.05 and absolute log2FC > 1
-### - DEG-style lollipop summary plots:
-###   1) Inoculated vs Mock at each time point
-###   2) Sequential Inoculated comparisons
-############################################################
+# =============================================================================
+# Script:  01_metabolomics_workflow.R
+# Purpose: Canonical preprocessing and QC/exploratory workflow for the
+#          untargeted LC-MS/MS metabolomics feature tables (NEG, POS, and
+#          COMB ESI modes) - missing-value and IQR filtering, median
+#          normalization, log10 transformation, Pareto scaling, sample
+#          distance heatmaps (Euclidean/Pearson/Spearman), PCA, t-SNE, UMAP,
+#          per-time-point PCA/t-SNE/UMAP for COMB, and differential
+#          accumulated metabolite (DAM) analysis with limma (see NOTE below).
+#
+#          Style notes kept from the original script:
+#          - Colors follow the C. melo RNA-seq script's palette convention
+#            (Mock/Inoculated from viridis; time points as sequential
+#            viridis; heatmaps in viridis).
+#          - DAM analysis: limma contrasts on median-normalized,
+#            log10-transformed values (before Pareto scaling); threshold
+#            adjusted p-value < 0.05 and |log2FC| > 1; DEG-style lollipop
+#            summaries for (1) Inoculated vs Mock at each time point and
+#            (2) sequential Inoculated comparisons.
+#
+#          NOTE: this limma-based DAM step differs from the one-way ANOVA
+#          with Benjamini-Hochberg FDR correction described in the article's
+#          Methods section for metabolomics. This has not been reconciled -
+#          see the "Repository status" section of the README.
+#
+# Input:   data/metabolomics/002_METABO_NEG_AVG.txt
+#          data/metabolomics/002_METABO_POS_AVG.txt
+#          data/metabolomics/003_METABO_COMB_AVG.txt
+# Output:  results/metabolomics/workflow/figures/
+#          results/metabolomics/workflow/summaries/
+#          results/metabolomics/workflow/metadata/
+# Usage:   Rscript scripts/metabolomics/01_metabolomics_workflow.R
+#          (run from the project root; see data/README.md to obtain inputs)
+# =============================================================================
 
 suppressPackageStartupMessages({
   library(ggplot2)
@@ -1397,9 +1413,9 @@ write_metadata <- function(metadata_dir, dataset_specs, workflow_tag) {
 
 run_metabo_workflow <- function(project_dir) {
   project_dir <- normalizePath(project_dir, winslash = "/", mustWork = TRUE)
-  
-  data_processed_dir <- file.path(project_dir, "data", "processed")
-  results_dir <- make_dir(file.path(project_dir, "results"))
+
+  data_processed_dir <- file.path(project_dir, "data", "metabolomics")
+  results_dir <- make_dir(file.path(project_dir, "results", "metabolomics", "workflow"))
   figures_dir <- make_dir(file.path(results_dir, "figures"))
   summaries_dir <- make_dir(file.path(results_dir, "summaries"))
   metadata_dir <- make_dir(file.path(results_dir, "metadata"))
@@ -1513,15 +1529,10 @@ run_metabo_workflow <- function(project_dir) {
 
 ############################################################
 ### Script entry point
+### Assumes the working directory is the project root (see Usage in the
+### header above), consistent with the other scripts in this repository.
 ############################################################
 
 if (sys.nframe() == 0) {
-  args <- commandArgs(trailingOnly = FALSE)
-  script_arg <- grep("^--file=", args, value = TRUE)
-  if (length(script_arg) == 0) {
-    stop("Cannot determine script location.")
-  }
-  script_path <- normalizePath(sub("^--file=", "", script_arg[1]), winslash = "/", mustWork = TRUE)
-  project_dir <- normalizePath(file.path(dirname(script_path), ".."), winslash = "/", mustWork = TRUE)
-  run_metabo_workflow(project_dir)
+  run_metabo_workflow(project_dir = ".")
 }

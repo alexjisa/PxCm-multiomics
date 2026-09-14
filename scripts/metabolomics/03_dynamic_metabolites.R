@@ -1,3 +1,15 @@
+# =============================================================================
+# Script:  03_dynamic_metabolites.R
+# Purpose: Plot a heatmap of the 20 significant metabolomics features with
+#          the highest variance across time (row z-scored mean intensity per
+#          time point), faceted by condition (Mock / Inoculated).
+#
+# Input:   data/metabolomics/15_Metabolomics_Significant.xlsx (sheet "Significant")
+# Output:  results/metabolomics/dynamic_metabolites/Top20_dynamic_metabolites_heatmap.{png,svg}
+# Usage:   Rscript scripts/metabolomics/03_dynamic_metabolites.R
+#          (run from the project root; see data/README.md to obtain inputs)
+# =============================================================================
+
 suppressPackageStartupMessages({
   library(readxl)
   library(dplyr)
@@ -7,7 +19,12 @@ suppressPackageStartupMessages({
   library(svglite)
 })
 
-input_file <- "15_Metabolomics_Significant.xlsx"
+# Paths are relative to the project root (see Usage in the header above).
+data_dir <- file.path("data", "metabolomics")
+results_dir <- file.path("results", "metabolomics", "dynamic_metabolites")
+dir.create(results_dir, recursive = TRUE, showWarnings = FALSE)
+
+input_file <- file.path(data_dir, "15_Metabolomics_Significant.xlsx")
 df <- read_excel(input_file, sheet = "Significant")
 
 sample_cols <- names(df)[str_detect(names(df), "^[0-9]+h_[MI]_R[123]")]
@@ -138,7 +155,7 @@ p <- ggplot(plot_df, aes(x = TimeLabel, y = Feature, fill = Zscore)) +
 print(p)
 
 ggsave(
-  "Top20_dynamic_metabolites_heatmap.png",
+  file.path(results_dir, "Top20_dynamic_metabolites_heatmap.png"),
   p,
   width = 14,
   height = 5,
@@ -146,7 +163,7 @@ ggsave(
 )
 
 ggsave(
-  "Top20_dynamic_metabolites_heatmap.svg",
+  file.path(results_dir, "Top20_dynamic_metabolites_heatmap.svg"),
   p,
   width = 14,
   height = 5

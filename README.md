@@ -1,18 +1,21 @@
 # PxCm-multiomics
 
-Analysis code associated with the dataset and article:
+Analysis code accompanying the manuscript:
 
 > **Temporal multi-omics dataset of a cucurbit-powdery mildew interaction**
 > Jimenez-Sanchez A., Fernandez-Ortuno D., Pastor V., Polonio A., Perez-Garcia A.
-> *Scientific Data* (in preparation / 2026).
+> *Scientific Data* (in preparation, 2026).
 
-Temporal dual RNA-seq (host-pathogen) and untargeted LC-MS/MS metabolomics
-resources for the *Cucumis melo* - *Podosphaera xanthii* (cucurbit powdery
-mildew) interaction, sampled across 12 time points between 12 and 144 hours
-post-inoculation.
+## Overview
 
-This repository contains code only. Raw and processed data are deposited in
-public repositories, see below.
+Temporal dual RNA-seq (host-pathogen) and untargeted LC-MS/MS metabolomics of
+the *Cucumis melo* (melon) - *Podosphaera xanthii* (cucurbit powdery mildew)
+interaction. Inoculated and mock-treated melon leaves were sampled at 12 time
+points from 12 to 144 hours post-inoculation (hpi), and profiled by dual
+RNA-seq and untargeted metabolomics from the same biological material. This
+repository contains the R scripts used to process and explore that dataset:
+differential expression, functional enrichment, temporal clustering, and
+metabolomics QC/differential abundance analysis.
 
 ## Data availability
 
@@ -26,58 +29,58 @@ public repositories, see below.
 
 ## Repository structure
 
+```text
+PxCm-multiomics/
+├── README.md
+├── LICENSE
+├── .gitignore
+├── session_info.txt
+│
+├── scripts/
+│   ├── transcriptomics/
+│   │   ├── 01_Cm_transcriptomics.R   # C. melo: TPM, QC, DESeq2, clustering, GO/KEGG
+│   │   ├── 02_Px_transcriptomics.R   # P. xanthii: TPM, QC, DESeq2, clustering, KEGG
+│   │   └── 03_detected_genes.R       # Detected-genes (TPM>=1) violin plot
+│   │
+│   └── metabolomics/
+│       ├── 01_metabolomics_workflow.R  # QC, PCA/t-SNE/UMAP, DAM analysis
+│       ├── 02_pathway_enrichment.R     # KEGG pathway coverage plot
+│       └── 03_dynamic_metabolites.R    # Top 20 dynamic-features heatmap
+│
+├── data/
+│   └── README.md                     # Where to download inputs, expected layout
+│
+└── docs/
+    └── data_dictionary.md            # Per-file column/content description
 ```
-scripts/
-  transcriptomics/
-    Cm_transcriptomics.R          # C. melo: TPM, PCA/t-SNE/UMAP, DESeq2, temporal clustering, GO/KEGG
-    Px_transcriptomics.R          # P. xanthii: TPM, PCA/t-SNE/UMAP, DESeq2, temporal clustering, KEGG
-    detected_genes_violin.R       # Detected genes (TPM>=1) per group: Cm Mock/Inoculated and Px
-  metabolomics/
-    metabolomics_workflow.R       # QC/exploratory: PCA, t-SNE/UMAP, sample-distance heatmaps, DAM analysis (limma)
-    pathway_enrichment.R          # KEGG pathway coverage (from MarVis-Pathway output)
-    top_dynamic_metabolites_heatmap.R  # Heatmap of the 20 most dynamic features
+
+Each script writes its outputs under `results/transcriptomics/` or
+`results/metabolomics/` (git-ignored; created automatically when a script
+runs).
+
+## How to obtain the input data
+
+The processed input files are not stored in this repository. Download them
+from the Zenodo record above and place them under `data/` as described in
+[`data/README.md`](data/README.md). [`docs/data_dictionary.md`](docs/data_dictionary.md)
+documents the contents of each file and which script reads it.
+
+## How to run the analyses
+
+Run every script from the project root, e.g.:
+
+```bash
+Rscript scripts/transcriptomics/01_Cm_transcriptomics.R
+Rscript scripts/transcriptomics/02_Px_transcriptomics.R
+Rscript scripts/transcriptomics/03_detected_genes.R
+Rscript scripts/metabolomics/01_metabolomics_workflow.R
+Rscript scripts/metabolomics/02_pathway_enrichment.R
+Rscript scripts/metabolomics/03_dynamic_metabolites.R
 ```
 
-Each script assumes it is run with the working directory set to the folder
-containing the corresponding processed data files (downloaded from Zenodo,
-see above). Input files expected by each script:
-
-| Script | Input files |
-|---|---|
-| `Cm_transcriptomics.R` | `01_Transcriptomics_Cm_counts.txt`, `02_Transcriptomics_Cm_sample_info.txt` |
-| `Px_transcriptomics.R` | `01_Transcriptomics_Px_counts.txt`, `02_Transcriptomics_Px_sample_info.txt`, `Px_functional_annotation.xlsx` (optional, eggNOG-mapper annotation for KEGG enrichment) |
-| `detected_genes_violin.R` | `03_Transcriptomics_Cm_TPM.txt`, `03_Transcriptomics_Px_TPM.txt` |
-| `metabolomics_workflow.R` | `data/processed/002_METABO_NEG_AVG.txt`, `data/processed/002_METABO_POS_AVG.txt`, `data/processed/003_METABO_COMB_AVG.txt` |
-| `pathway_enrichment.R` | `14_Metabolomics_Sets.xlsx` |
-| `top_dynamic_metabolites_heatmap.R` | `15_Metabolomics_Significant.xlsx` |
-
-`Cm_transcriptomics.R` looks for the input files in `data/processed/` if that
-folder exists under the working directory, and otherwise in the working
-directory itself. `metabolomics_workflow.R` is called as
-`Rscript scripts/metabolomics/metabolomics_workflow.R` from the project root
-and always reads its inputs from `data/processed/` and writes outputs under
-`results/`. The other scripts look for their inputs in the working directory.
-
-## Methods (summary)
-
-- **Transcriptomics**: FastQC (v0.11.9) + MultiQC (v1.27) for quality
-  control; Trimmomatic (v0.39) for adapter/quality trimming; HISAT2 (v2.2.1)
-  for alignment against the *C. melo* genome assembly v4.0 (mock samples)
-  and, for inoculated samples, sequential alignment against the *C. melo*
-  genome followed by the *P. xanthii* isolate 2086 genome; SAMtools (v1.23.1)
-  for alignment processing; featureCounts (v2.0.6) for read counting; DESeq2
-  (v1.46.0) for differential expression (padj < 0.05, |log2FC| > 1);
-  functional enrichment with DAVID (v6.8, KEGG, *C. melo*) and
-  clusterProfiler (v4.14.6, GO via eggNOG-mapper v2, *P. xanthii*).
-- **Metabolomics**: LC-MS/MS acquisition (ESI+/ESI-) with MassLynx (v4.2);
-  processing with the `xcms` package (centWave peak detection, retention
-  time correction, peak grouping, missing-value imputation); filtering and
-  tentative metabolite identification with MarVis-Suite 2.0 (MarVis-Filter,
-  MarVis-Pathway); differential features by one-way ANOVA with FDR
-  correction (Benjamini-Hochberg, p.adj < 0.05).
-- Analysis performed in R (v4.4.2).
-
-Full parameter details are in the Methods section of the article.
+Each script's header documents its exact inputs, outputs, and usage. Within
+each `scripts/transcriptomics/` and `scripts/metabolomics/` folder, scripts
+are independent of each other (none reads another script's output).
 
 ## Dependencies (R)
 
@@ -87,21 +90,14 @@ Full parameter details are in the Methods section of the article.
 `enrichplot`, `KEGGREST`, `httr`, `xml2`, `rvest`.
 
 Exact package versions verified to run these scripts are listed in
-[`session_info.txt`](session_info.txt).
+[`session_info.txt`](session_info.txt) (R 4.4.2, matching the version cited
+in the article's Methods).
 
 ## Repository status
 
-This repository is under construction. It currently includes the
-DESeq2/clustering/enrichment transcriptomics processing, a metabolomics
-QC/exploratory workflow (PCA, sample-distance heatmaps, t-SNE/UMAP, and
-differential accumulated metabolite [DAM] analysis), and two metabolomics
-visualization scripts (pathway coverage and temporal-dynamics heatmap).
-
-Note: `metabolomics_workflow.R` identifies DAMs with `limma` (moderated
-t-statistics on median-normalized, log10-transformed, Pareto-scaled
-intensities), which differs from the one-way ANOVA with Benjamini-Hochberg
-FDR correction described in the article's Methods section. This has not yet
-been reconciled with the manuscript text.
+This repository is currently under construction. The final analysis scripts
+associated with the article are being prepared and will be uploaded to this
+repository.
 
 ## License
 
@@ -109,7 +105,8 @@ MIT, see [LICENSE](LICENSE).
 
 ## Citation
 
-If you use this code or the associated dataset, please cite the article (see
-the header of this README) and the corresponding data repositories
-(BioProject PRJNA1454108, MetaboLights MTBLS15447, Zenodo DOI
-10.5281/zenodo.19555639).
+> **Temporal multi-omics dataset of a cucurbit-powdery mildew interaction**
+> Jimenez-Sanchez A., Fernandez-Ortuno D., Pastor V., Polonio A., Perez-Garcia A.
+> *Scientific Data* (in preparation, 2026).
+
+The full citation and DOI will be added upon publication.

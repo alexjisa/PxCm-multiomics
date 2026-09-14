@@ -1,24 +1,34 @@
-############################################################
-### Podosphaera xanthii RNA-seq time-course analysis
-### Publication-oriented script version
-###
-### Includes:
-### - TPM export
-### - Sample distances, dendrogram, PCA, t-SNE, UMAP
-### - DESeq2 across consecutive time points
-### - DESeq2 across infection phases
-### - Temporal clustering of dynamic genes (k-means)
-### - Functional enrichment analysis (KEGG)
-### - Distribution of expression changes (ordered violin plot)
-###
-### Main methodological decisions:
-### - DESeq2 time-course analysis uses design = ~ time_point
-### - Infection-phase analysis is performed separately with design = ~ infection_phase
-### - Temporal clustering is performed on DEGs from consecutive comparisons
-### - Expression values are averaged by time point and scaled by gene
-### - k = 4 is used for k-means because it gave a better balance
-###   between statistical support and biological interpretability
-############################################################
+# =============================================================================
+# Script:  02_Px_transcriptomics.R
+# Purpose: Podosphaera xanthii RNA-seq time-course analysis - TPM export,
+#          sample QC (distance heatmap/dendrogram, PCA, t-SNE, UMAP), DESeq2
+#          differential expression across consecutive time points and across
+#          infection phases (Early/Intermediate/Late), temporal k-means
+#          clustering (k=4) of dynamic genes, KEGG functional enrichment per
+#          comparison/direction, and distribution of expression changes
+#          (violin plot).
+#
+#          Methodological notes kept from the original script:
+#          - DESeq2 time-course model uses design = ~ time_point.
+#          - Infection-phase analysis is run separately with
+#            design = ~ infection_phase, since infection_phase is derived
+#            from time_point.
+#          - Temporal clustering uses the union of DEGs from consecutive
+#            time-point comparisons, averaged by time point and gene-scaled.
+#          - k = 4 was chosen (elbow/silhouette comparison) as the best
+#            balance between statistical support and biological
+#            interpretability.
+#
+# Input:   data/transcriptomics/01_Transcriptomics_Px_counts.txt
+#          data/transcriptomics/02_Transcriptomics_Px_sample_info.txt
+#          data/transcriptomics/04_Px_Annotations_eggNOG-mapper.xlsx (optional;
+#            eggNOG-mapper output, used for KEGG_ko-based KEGG enrichment)
+# Output:  results/transcriptomics/Px/figures/
+#          results/transcriptomics/Px/tables/ (deseq2, tsne, umap, clustering,
+#            enrichment subfolders)
+# Usage:   Rscript scripts/transcriptomics/02_Px_transcriptomics.R
+#          (run from the project root; see data/README.md to obtain inputs)
+# =============================================================================
 
 ############################################################
 ### 1. Load required libraries
@@ -53,11 +63,14 @@ has_keggrest <- requireNamespace("KEGGREST", quietly = TRUE)
 ### 2. Define input files and output directories
 ############################################################
 
-counts_file <- "01_Transcriptomics_Px_counts.txt"
-sampleinfo_file <- "02_Transcriptomics_Px_sample_info.txt"
-annotation_file <- "Px_functional_annotation.xlsx"   # Optional
+# Paths are relative to the project root (see Usage in the header above).
+data_dir <- file.path("data", "transcriptomics")
 
-results_dir <- "results"
+counts_file <- file.path(data_dir, "01_Transcriptomics_Px_counts.txt")
+sampleinfo_file <- file.path(data_dir, "02_Transcriptomics_Px_sample_info.txt")
+annotation_file <- file.path(data_dir, "04_Px_Annotations_eggNOG-mapper.xlsx")   # Optional
+
+results_dir <- file.path("results", "transcriptomics", "Px")
 figures_dir <- file.path(results_dir, "figures")
 tables_dir <- file.path(results_dir, "tables")
 deseq_dir <- file.path(tables_dir, "deseq2")

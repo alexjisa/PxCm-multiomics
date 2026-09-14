@@ -1,6 +1,8 @@
-# Data and results (not versioned in this code-only repo)
+# Local input data (downloaded from Zenodo, see data/README.md) and
+# generated results are not versioned in this code-only repo.
+data/transcriptomics/*
+data/metabolomics/*
 results/
-results_melon/
 
 # R
 .Rhistory
@@ -9,5 +11,5 @@ results_melon/
 .Rproj.user/
 *.Rproj
 
-# SO
+# OS
 .DS_Store
