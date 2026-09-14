@@ -33,6 +33,7 @@ scripts/
     Px_transcriptomics.R          # P. xanthii: TPM, PCA/t-SNE/UMAP, DESeq2, temporal clustering, KEGG
     detected_genes_violin.R       # Detected genes (TPM>=1) per group: Cm Mock/Inoculated and Px
   metabolomics/
+    metabolomics_workflow.R       # QC/exploratory: PCA, t-SNE/UMAP, sample-distance heatmaps, DAM analysis (limma)
     pathway_enrichment.R          # KEGG pathway coverage (from MarVis-Pathway output)
     top_dynamic_metabolites_heatmap.R  # Heatmap of the 20 most dynamic features
 ```
@@ -46,13 +47,16 @@ see above). Input files expected by each script:
 | `Cm_transcriptomics.R` | `01_Transcriptomics_Cm_counts.txt`, `02_Transcriptomics_Cm_sample_info.txt` |
 | `Px_transcriptomics.R` | `01_Transcriptomics_Px_counts.txt`, `02_Transcriptomics_Px_sample_info.txt`, `Px_functional_annotation.xlsx` (optional, eggNOG-mapper annotation for KEGG enrichment) |
 | `detected_genes_violin.R` | `03_Transcriptomics_Cm_TPM.txt`, `03_Transcriptomics_Px_TPM.txt` |
+| `metabolomics_workflow.R` | `data/processed/002_METABO_NEG_AVG.txt`, `data/processed/002_METABO_POS_AVG.txt`, `data/processed/003_METABO_COMB_AVG.txt` |
 | `pathway_enrichment.R` | `14_Metabolomics_Sets.xlsx` |
 | `top_dynamic_metabolites_heatmap.R` | `15_Metabolomics_Significant.xlsx` |
 
 `Cm_transcriptomics.R` looks for the input files in `data/processed/` if that
 folder exists under the working directory, and otherwise in the working
-directory itself. The other scripts look for their inputs in the working
-directory.
+directory itself. `metabolomics_workflow.R` is called as
+`Rscript scripts/metabolomics/metabolomics_workflow.R` from the project root
+and always reads its inputs from `data/processed/` and writes outputs under
+`results/`. The other scripts look for their inputs in the working directory.
 
 ## Methods (summary)
 
@@ -79,19 +83,29 @@ Full parameter details are in the Methods section of the article.
 
 `DESeq2`, `ggplot2`, `dplyr`, `tidyr`, `stringr`, `readr`, `readxl`,
 `pheatmap`, `viridis`, `ggrepel`, `Rtsne`, `uwot`, `dendextend`, `scales`,
-`svglite`. Optional (functional enrichment): `clusterProfiler`,
+`svglite`, `limma`. Optional (functional enrichment): `clusterProfiler`,
 `enrichplot`, `KEGGREST`, `httr`, `xml2`, `rvest`.
+
+Exact package versions verified to run these scripts are listed in
+[`session_info.txt`](session_info.txt).
 
 ## Repository status
 
 This repository is under construction. It currently includes the
-DESeq2/clustering/enrichment transcriptomics processing and two metabolomics
+DESeq2/clustering/enrichment transcriptomics processing, a metabolomics
+QC/exploratory workflow (PCA, sample-distance heatmaps, t-SNE/UMAP, and
+differential accumulated metabolite [DAM] analysis), and two metabolomics
 visualization scripts (pathway coverage and temporal-dynamics heatmap).
-Still pending: the metabolomics quality-control and exploratory analysis
-script (sample PCA, intensity boxplot/density, replicate correlation and CV,
-missing values, per-time-point volcano plots and the temporal results
-summary), which currently exists only as output figures/tables without the
-source code included here yet.
+
+Note: `metabolomics_workflow.R` identifies DAMs with `limma` (moderated
+t-statistics on median-normalized, log10-transformed, Pareto-scaled
+intensities), which differs from the one-way ANOVA with Benjamini-Hochberg
+FDR correction described in the article's Methods section. This has not yet
+been reconciled with the manuscript text.
+
+## License
+
+MIT, see [LICENSE](LICENSE).
 
 ## Citation
 
